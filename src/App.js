@@ -9,14 +9,15 @@ class App extends Component {
   };
 
   _consultar = () => {
-    fetch("https://thingspeak.com/channels/1049814/feed.json")
+    fetch("https://api.thingspeak.com/channels/1049814/feeds.json?results=100")
       .then((res) => res.json())
       .then((results) => {
-        //console.log(results)
-        //const { feeds } = results;
+        console.log(results)
+        const { feeds } = results;
 
         this.setState({ feeds: results.feeds });
       });
+    
   };
 
 
