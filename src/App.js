@@ -2,20 +2,29 @@ import React, { Component } from "react";
 import "./App.css";
 import "bulma/css/bulma.css";
 import { Datos } from "./componentes/datos.js";
+import  { Bar } from 'react-chartjs-2'
 
 class App extends Component {
   state = {
     feeds: [],
+    labels: [],
+    datasets: [],
   };
 
   _consultar = () => {
-    fetch("https://api.thingspeak.com/channels/1049814/feeds.json?results=100")
+    fetch("https://api.thingspeak.com/channels/1549689/feeds.json?api_key=PX3JS7WOO9KTUDQG&results=100")
       .then((res) => res.json())
       .then((results) => {
         console.log(results)
         const { feeds } = results;
+        let labels = []
+        let datasets = []
+        feeds.map((dato) => {
+          labels.push(dato.created_at)
+          datasets.push(dato.field1)
+        })
 
-        this.setState({ feeds: results.feeds });
+        this.setState({ feeds: results.feeds, labels, datasets });
       });
     
   };
@@ -27,6 +36,7 @@ class App extends Component {
 
   _hacerDatos = () =>{
     const {feeds} = this.state
+  
     return(
       feeds.map(dato =>
         <div key={dato.entry_id}>
@@ -47,10 +57,42 @@ class App extends Component {
     return (
       <div className="App">
         <div className="contenedor">
-          {console.log(this.state.feeds)}
-          {this._hacerDatos()}
-        
+          <Bar 
+            data={{
+                labels: this.state.labels,
+                datasets: [{
+                  label: 'Distancia (cm)',
+                  data: this.state.datasets,
+                  backgroundColor: [
+                      'rgba(255, 99, 132, 0.2)',
+                      'rgba(54, 162, 235, 0.2)',
+                      'rgba(255, 206, 86, 0.2)',
+                      'rgba(75, 192, 192, 0.2)',
+                      'rgba(153, 102, 255, 0.2)',
+                      'rgba(255, 159, 64, 0.2)'
+                  ],
+                  borderColor: [
+                      'rgba(255, 99, 132, 1)',
+                      'rgba(54, 162, 235, 1)',
+                      'rgba(255, 206, 86, 1)',
+                      'rgba(75, 192, 192, 1)',
+                      'rgba(153, 102, 255, 1)',
+                      'rgba(255, 159, 64, 1)'
+                  ],
+                  borderWidth: 1
+              }]
+            }}
+            height={400}
+            width={600}
+            options={{
+              maintainAspectRatio:false
+            }}
+          />
         </div>
+        <div className="contenedor">
+        {console.log(this.state.feeds)}
+          {this._hacerDatos()}
+          </div>
       </div>
     );
   }
